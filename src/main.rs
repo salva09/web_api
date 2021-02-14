@@ -1,21 +1,18 @@
 #![feature(proc_macro_hygiene, decl_macro)]
-use rocket::request::Form;
-use rocket::response::{Flash, Redirect};
 use rocket::*;
+use rocket_contrib::json;
+use rocket_contrib::json::{Json, JsonValue};
+use serde::{Deserialize, Serialize};
 
-#[derive(FromForm)]
-struct Task {
-    description: String,
-    completed: bool,
+#[derive(Serialize, Deserialize)]
+struct Message {
+    contents: String,
 }
 
-#[post("/", data = "<task>")]
-fn new(task: Form<Task>) -> Flash<Redirect> {
-    if task.description.is_empty() {
-        Flash::error(Redirect::to("/"), "Cannot be empty.")
-    } else {
-        Flash::success(Redirect::to("/"), "Task added.")
-    }
+#[put("/", data = "<msg>")]
+fn update(msg: Json<Message>) -> JsonValue {
+    println!("{}", msg.0.contents);
+    json!({ "message": msg.0.contents })
 }
 
 #[get("/hello/<name>")]
@@ -24,5 +21,5 @@ fn hello(name: String) -> String {
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![new, hello]).launch();
+    rocket::ignite().mount("/", routes![update, hello]).launch();
 }
