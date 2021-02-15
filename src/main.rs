@@ -1,5 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro)]
-use rocket::*;
+
+#[macro_use] extern crate rocket;
+
 use rocket_contrib::json;
 use rocket_contrib::json::{Json, JsonValue};
 use serde::{Deserialize, Serialize};
